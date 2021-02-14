@@ -2,6 +2,7 @@ import logging
 import json
 import pdb
 from flask import Flask, request, jsonify, make_response
+from flask_httpauth import HTTPBasicAuth
 from flask_restful import Resource, Api
 
 import dyncontest
@@ -19,12 +20,23 @@ sudo systemctl restart tabelline.service; sudo journalctl -f -u tabelline
 
 app = Flask(__name__)
 api = Api(app)
+auth = HTTPBasicAuth()
+
+USER_DATA = {
+    "fabio": "<<<PASSWORD HERE>>>",
+}
 
 logging.basicConfig(level=logging.DEBUG)
 #logging.basicConfig(level=logging.WARNING)
 
+@auth.verify_password
+def verify(username, password):
+    if not (username and password):
+        return False
+    return USER_DATA.get(username) == password
 
 class Tabelline(Resource):
+    @auth.login_required
     def post(self):
         json_data = request.json
         responseId = json_data['responseId']
@@ -53,10 +65,9 @@ class Tabelline(Resource):
         resp.status_code = 200
         return resp
 
-api.add_resource(Tabelline, '/tabelline') 
+api.add_resource(Tabelline, '/tabelline')
 
 if __name__ == '__main__':
      PORT = 5004
      print("Listening on port {}...".format(PORT))
      app.run(port='{}'.format(PORT))
-
