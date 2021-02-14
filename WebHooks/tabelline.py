@@ -55,15 +55,13 @@ class Tabelline(Resource):
                 }
                 },
         }
-        if intentName in ["richiestaTabellina", "richiestaTabellinaFinoA", "richiestaTutteTabelline", "rispostaNumero", "statistiche"]:
+        if intentName in ["richiestaTabellina", "richiestaTabellinaDa", "richiestaTabellinaFinoA", "richiestaTutteTabelline", "rispostaNumero", "statistiche"]:
                 # richiesta di un nuovo tipo di domande
                 # (singola tabellina, fino a una certa tabellina, tutte le tabelline)
                 dc = dyncontest.DynContest(json_data, logging.getLogger())
                 return make_response(jsonify(dc.respond()))
 
-        resp = jsonify(fullfillmentJson)
-        resp.status_code = 200
-        return resp
+        return make_response(jsonify(fullfillmentJson))
 
 api.add_resource(Tabelline, '/tabelline')
 
